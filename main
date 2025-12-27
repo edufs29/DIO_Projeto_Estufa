@@ -1,0 +1,66 @@
+// Declaração das variáveis globais
+int valorADC;        // Armazena o valor lido do conversor A/D (ADC)
+int temperatura;    // Armazena a temperatura convertida a partir do ADC
+int estadoMotor;    // Variável declarada, mas não utilizada no código
+
+void setup()
+{
+  // Inicializa a comunicação serial com taxa de 9600 bps
+  Serial.begin(9600);
+
+  // Configura os pinos digitais como saída
+  pinMode(13, OUTPUT);  // LED vermelho
+  pinMode(12, OUTPUT);  // LED azul
+  pinMode(11, OUTPUT);  // LED verde
+  pinMode(4, OUTPUT);   // Atuador motor
+  pinMode(2, OUTPUT);   // Atuador buzzer
+
+  // Configura o pino analógico A5 como entrada
+  pinMode(A5, INPUT);
+
+  // Inicializa todos os pinos de saída em nível baixo (desligados)
+  digitalWrite(13, LOW);
+  digitalWrite(12, LOW);
+  digitalWrite(11, LOW);
+  digitalWrite(4, LOW);
+  digitalWrite(2, LOW);
+}
+
+void loop()
+{
+  // Lê o valor analógico do pino A5 (0 a 1023)
+  valorADC = analogRead(A5);
+
+  // Converte o valor do ADC para temperatura
+  // Faixa do ADC: 20 a 358
+  // Faixa de temperatura correspondente: -40 °C a 125 °C
+  temperatura = map(valorADC, 20, 358, -40, 125);
+
+  // Se a temperatura for menor que 30 °C
+  if (temperatura < 30) {
+    // Desliga todos os atuadores
+    digitalWrite(13, LOW);
+    digitalWrite(12, LOW);
+    digitalWrite(11, LOW);
+    digitalWrite(2, LOW);
+    digitalWrite(4, LOW);
+
+  // Se a temperatura for maior que 50 °C
+  } else if (temperatura > 50) {
+    // Liga os atuadores principais (motor, ventilador, alarme)
+    digitalWrite(13, HIGH);
+    digitalWrite(12, LOW);
+    digitalWrite(11, LOW);
+    digitalWrite(2, HIGH);
+    digitalWrite(4, HIGH);
+
+  // Caso a temperatura esteja entre 30 °C e 50 °C
+  } else {
+    // Mantém apenas um atuador ligado (ventilação parcial)
+    digitalWrite(13, LOW);
+    digitalWrite(12, LOW);
+    digitalWrite(11, LOW);
+    digitalWrite(2, LOW);
+    digitalWrite(4, HIGH);
+  }
+}
